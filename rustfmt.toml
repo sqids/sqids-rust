@@ -1,0 +1,13 @@
+max_width = 100
+comment_width = 100
+hard_tabs = true
+edition = "2021"
+reorder_imports = true
+imports_granularity = "Crate"
+use_small_heuristics = "Max"
+wrap_comments = true
+binop_separator = "Back"
+trailing_comma = "Vertical"
+trailing_semicolon = true
+use_field_init_shorthand = true
+format_macro_bodies = true
