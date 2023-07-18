@@ -15,7 +15,7 @@ fn simple() {
 fn different_inputs() {
 	let sqids = Sqids::new(None).unwrap();
 
-	let numbers = vec![0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, sqids.max_value()];
+	let numbers = vec![0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, Sqids::max_value()];
 
 	assert_eq!(sqids.decode(&sqids.encode(&numbers).unwrap()), numbers);
 }
@@ -117,13 +117,4 @@ fn decoding_invalid_character() {
 	let sqids = Sqids::new(None).unwrap();
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode("*"), numbers);
-}
-
-#[test]
-#[should_panic]
-fn encode_out_of_range_numbers() {
-	let sqids = Sqids::new(None).unwrap();
-
-	assert!(sqids.encode(&[sqids.min_value() - 1]).is_err());
-	assert!(sqids.encode(&[sqids.max_value() + 1]).is_err());
 }

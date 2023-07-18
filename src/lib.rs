@@ -1,7 +1,7 @@
 use derive_more::Display;
 use std::{collections::HashSet, result};
 
-#[derive(Display, Debug)]
+#[derive(Display, Debug, Eq, PartialEq)]
 pub enum Error {
 	#[display(fmt = "Alphabet length must be at least 5")]
 	AlphabetLength,
@@ -23,9 +23,9 @@ pub fn default_blocklist() -> HashSet<String> {
 
 #[derive(Debug)]
 pub struct Options {
-	alphabet: String,
-	min_length: usize,
-	blocklist: HashSet<String>,
+	pub alphabet: String,
+	pub min_length: usize,
+	pub blocklist: HashSet<String>,
 }
 
 impl Options {
@@ -81,6 +81,15 @@ impl Sqids {
 			return Err(Error::AlphabetUniqueCharacters);
 		}
 
+		if options.min_length < Self::min_value() as usize ||
+			options.min_length > options.alphabet.len()
+		{
+			return Err(Error::MinLength {
+				min: Self::min_value() as usize,
+				max: options.alphabet.len(),
+			});
+		}
+
 		let filtered_blocklist: HashSet<String> = options
 			.blocklist
 			.iter()
@@ -97,15 +106,6 @@ impl Sqids {
 		let mut sqids =
 			Sqids { alphabet, min_length: options.min_length, blocklist: filtered_blocklist };
 
-		if options.min_length < sqids.min_value() as usize ||
-			options.min_length > options.alphabet.len()
-		{
-			return Err(Error::MinLength {
-				min: sqids.min_value() as usize,
-				max: options.alphabet.len(),
-			});
-		}
-
 		sqids.alphabet = sqids.shuffle(&sqids.alphabet);
 		Ok(sqids)
 	}
@@ -118,11 +118,11 @@ impl Sqids {
 		let in_range_numbers: Vec<u64> = numbers
 			.iter()
 			.copied()
-			.filter(|&n| n >= self.min_value() && n <= self.max_value())
+			.filter(|&n| n >= Self::min_value() && n <= Self::max_value())
 			.collect();
 
 		if in_range_numbers.len() != numbers.len() {
-			return Err(Error::EncodingRange { min: self.min_value(), max: self.max_value() });
+			return Err(Error::EncodingRange { min: Self::min_value(), max: Self::max_value() });
 		}
 
 		self.encode_numbers(&in_range_numbers, false)
@@ -181,11 +181,11 @@ impl Sqids {
 		ret
 	}
 
-	pub fn min_value(&self) -> u64 {
+	pub fn min_value() -> u64 {
 		0
 	}
 
-	pub fn max_value(&self) -> u64 {
+	pub fn max_value() -> u64 {
 		u64::MAX
 	}
 
@@ -233,11 +233,9 @@ impl Sqids {
 			}
 
 			if self.min_length > id.len() {
-				let mut new_id = id.clone();
-				let alphabet_slice = &alphabet[..(self.min_length - id.len())];
-				new_id.push_str(&alphabet_slice.iter().collect::<String>());
-				new_id.push_str(&id[1..]);
-				id = new_id;
+				id = id[..1].to_string() +
+					&alphabet[..(self.min_length - id.len())].iter().collect::<String>() +
+					&id[1..]
 			}
 		}
 
@@ -245,7 +243,7 @@ impl Sqids {
 			let mut new_numbers;
 
 			if partitioned {
-				if numbers[0] + 1 > self.max_value() {
+				if numbers[0] + 1 > Self::max_value() {
 					return Err(Error::BlocklistOutOfRange);
 				} else {
 					new_numbers = numbers.to_vec();
