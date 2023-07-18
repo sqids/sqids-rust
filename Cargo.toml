@@ -1,6 +1,16 @@
 [package]
 name = "sqids"
+description = "Generated YouTube-like ids from numbers."
+repository = "https://github.com/sqids/sqids-rust"
+documentation = "https://docs.rs/sqids"
+homepage = "https://sqids.org/rust"
 version = "0.1.0"
+license = "MIT"
 edition = "2021"
+readme = "README.md"
+keywords = ["ids", "encode", "sqids"]
 
 [dependencies]
+derive_more = "0.99.17"
+serde = "1.0.171"
+serde_json = "1.0.103"
