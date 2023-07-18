@@ -1,6 +1,6 @@
 use derive_more::Display;
 use std::collections::HashSet;
-use std::result::Result;
+use std::result;
 
 #[derive(Display, Debug)]
 pub enum Error {
@@ -8,13 +8,15 @@ pub enum Error {
     AlphabetLength,
     #[display(fmt = "Alphabet must contain unique characters")]
     AlphabetUniqueCharacters,
+    #[display(fmt = "Minimum length has to be between {min} and {max}")]
+    MinLength { min: usize, max: usize },
     #[display(fmt = "Encoding supports numbers between {min} and {max}")]
     EncodingRange { min: u64, max: u64 },
     #[display(fmt = "Ran out of range checking against the blocklist")]
     BlocklistOutOfRange,
 }
 
-pub type SqidsResult<T> = Result<T, Error>;
+pub type Result<T> = result::Result<T, Error>;
 
 #[derive(Debug)]
 pub struct Options {
@@ -41,7 +43,7 @@ pub struct Sqids {
 }
 
 impl Sqids {
-    pub fn new(options: Option<Options>) -> SqidsResult<Self> {
+    pub fn new(options: Option<Options>) -> Result<Self> {
         let options = options.unwrap_or_default();
         let alphabet: Vec<char> = options.alphabet.chars().collect();
 
@@ -73,11 +75,20 @@ impl Sqids {
             blocklist: filtered_blocklist,
         };
 
+        if options.min_length < sqids.min_value() as usize
+            || options.min_length > options.alphabet.len()
+        {
+            return Err(Error::MinLength {
+                min: sqids.min_value() as usize,
+                max: options.alphabet.len(),
+            });
+        }
+
         sqids.alphabet = sqids.shuffle(&sqids.alphabet);
         Ok(sqids)
     }
 
-    pub fn encode(&self, numbers: &[u64]) -> SqidsResult<String> {
+    pub fn encode(&self, numbers: &[u64]) -> Result<String> {
         if numbers.is_empty() {
             return Ok(String::new());
         }
@@ -165,12 +176,12 @@ impl Sqids {
         u64::MAX
     }
 
-    fn encode_numbers(&self, numbers: &[u64], partitioned: bool) -> SqidsResult<String> {
+    fn encode_numbers(&self, numbers: &[u64], partitioned: bool) -> Result<String> {
         let offset = numbers
             .iter()
             .enumerate()
             .fold(numbers.len(), |a, (i, &v)| {
-                (v as usize % self.alphabet.len()) + i + a
+                self.alphabet[v as usize % self.alphabet.len()] as usize + i + a
             })
             % self.alphabet.len();
 

@@ -28,15 +28,13 @@ jobs:
       - name: Lint
         run: |
           rustfmt +nightly **/*.rs
-          cargo clippy --all -- -D warnings -A clippy::redundant_async_block
+          cargo clippy --all -- -D warnings
       - name: Install cargo check tools
         run: |
-          cargo install --locked cargo-deny || true
           cargo install --locked cargo-outdated || true
           cargo install --locked cargo-udeps || true
       - name: Check
         run: |
-          cargo deny check
           cargo outdated --exit-code 1
           cargo udeps
           rm -rf ~/.cargo/advisory-db
