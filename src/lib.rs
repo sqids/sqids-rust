@@ -25,6 +25,28 @@ pub struct Options {
     blocklist: HashSet<String>,
 }
 
+impl Options {
+    pub fn new(
+        alphabet: Option<String>,
+        min_length: Option<usize>,
+        blocklist: Option<HashSet<String>>,
+    ) -> Self {
+        let mut options = Options::default();
+
+        if let Some(alphabet) = alphabet {
+            options.alphabet = alphabet;
+        }
+        if let Some(min_length) = min_length {
+            options.min_length = min_length;
+        }
+        if let Some(blocklist) = blocklist {
+            options.blocklist = blocklist;
+        }
+
+        options
+    }
+}
+
 impl Default for Options {
     fn default() -> Self {
         Options {
