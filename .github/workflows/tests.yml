@@ -10,7 +10,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
           override: true
           components: rustfmt, clippy
       - name: Set up cargo cache
@@ -27,14 +26,16 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-
       - name: Lint
         run: |
-          rustfmt +nightly **/*.rs
+          rustfmt **/*.rs
           cargo clippy --all -- -D warnings
       - name: Install cargo check tools
         run: |
+          cargo install --locked cargo-deny || true
           cargo install --locked cargo-outdated || true
           cargo install --locked cargo-udeps || true
       - name: Check
         run: |
+          cargo deny check
           cargo outdated --exit-code 1
           cargo udeps
           rm -rf ~/.cargo/advisory-db
