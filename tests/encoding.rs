@@ -2,7 +2,7 @@ use sqids::*;
 
 #[test]
 fn simple() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let numbers = vec![1, 2, 3];
 	let id = "8QRLaD";
@@ -13,7 +13,7 @@ fn simple() {
 
 #[test]
 fn different_inputs() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let numbers = vec![0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, Sqids::max_value()];
 
@@ -22,7 +22,7 @@ fn different_inputs() {
 
 #[test]
 fn incremental_numbers() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let ids = vec![
 		("bV", vec![0]),
@@ -45,7 +45,7 @@ fn incremental_numbers() {
 
 #[test]
 fn incremental_numbers_same_index_0() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let ids = vec![
 		("SrIu", vec![0, 0]),
@@ -68,7 +68,7 @@ fn incremental_numbers_same_index_0() {
 
 #[test]
 fn incremental_numbers_same_index_1() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let ids = vec![
 		("SrIu", vec![0, 0]),
@@ -91,7 +91,7 @@ fn incremental_numbers_same_index_1() {
 
 #[test]
 fn multi_input() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	let numbers: Vec<u64> = (0..100).collect();
 	let output = sqids.decode(&sqids.encode(&numbers).unwrap());
@@ -101,20 +101,20 @@ fn multi_input() {
 
 #[test]
 fn encoding_no_numbers() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	assert_eq!(sqids.encode(&[]).unwrap(), "");
 }
 
 #[test]
 fn decoding_empty_string() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode(""), numbers);
 }
 
 #[test]
 fn decoding_invalid_character() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode("*"), numbers);
 }

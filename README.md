@@ -17,7 +17,7 @@ cargo add sqids
 Simple encode & decode:
 
 ```rust
-let sqids = Sqids::new(None)?;
+let sqids = Sqids::default();
 let id = sqids.encode(&[1, 2, 3])?; // "8QRLaD"
 let numbers = sqids.decode(id); // [1, 2, 3]
 ```

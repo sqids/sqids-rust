@@ -3,7 +3,7 @@ use std::collections::HashSet;
 
 #[test]
 fn if_no_custom_blocklist_param_use_default_blocklist() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 
 	assert_eq!(sqids.decode("sexy"), vec![200044]);
 	assert_eq!(sqids.encode(&[200044]).unwrap(), "d171vI");

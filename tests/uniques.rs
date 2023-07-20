@@ -21,7 +21,7 @@ fn uniques_with_padding() {
 
 #[test]
 fn uniques_low_ranges() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	let mut set = HashSet::new();
 
 	for i in 0..UPPER {
@@ -36,7 +36,7 @@ fn uniques_low_ranges() {
 
 #[test]
 fn uniques_high_ranges() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	let mut set = HashSet::new();
 
 	for i in 100_000_000..100_000_000 + UPPER {
@@ -51,7 +51,7 @@ fn uniques_high_ranges() {
 
 #[test]
 fn uniques_multi() {
-	let sqids = Sqids::new(None).unwrap();
+	let sqids = Sqids::default();
 	let mut set = HashSet::new();
 
 	for i in 0..UPPER {

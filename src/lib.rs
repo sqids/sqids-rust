@@ -67,6 +67,12 @@ pub struct Sqids {
 	blocklist: HashSet<String>,
 }
 
+impl Default for Sqids {
+	fn default() -> Self {
+		Sqids::new(None).unwrap()
+	}
+}
+
 impl Sqids {
 	pub fn new(options: Option<Options>) -> Result<Self> {
 		let options = options.unwrap_or_default();
