@@ -10,7 +10,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
+          toolchain: nightly-2023-06-15
           override: true
           components: rustfmt, clippy
       - name: Set up cargo cache
