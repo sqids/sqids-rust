@@ -19,7 +19,7 @@ Simple encode & decode:
 ```rust
 let sqids = Sqids::default();
 let id = sqids.encode(&[1, 2, 3])?; // "8QRLaD"
-let numbers = sqids.decode(id); // [1, 2, 3]
+let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
 Randomize IDs by providing a custom alphabet:
@@ -31,7 +31,7 @@ let sqids = Sqids::new(Some(Options::new(
   None,
 )))?;
 let id = sqids.encode(&[1, 2, 3])?; // "B5aMa3"
-let numbers = sqids.decode(id); // [1, 2, 3]
+let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
 Enforce a *minimum* length for IDs:
@@ -43,7 +43,7 @@ let sqids = Sqids::new(Some(Options::new(
   None,
 )))?;
 let id = sqids.encode(&[1, 2, 3])?; // "75JT1cd0dL"
-let numbers = sqids.decode(id); // [1, 2, 3]
+let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
 Prevent specific words from appearing anywhere in the auto-generated IDs:
@@ -55,7 +55,7 @@ let sqids = Sqids::new(Some(Options::new(
   Some(HashSet::from(["word1".to_string(), "word2".to_string()])),
 )))?;
 let id = sqids.encode(&[1, 2, 3])?; // "8QRLaD"
-let numbers = sqids.decode(id); // [1, 2, 3]
+let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
 ## License
