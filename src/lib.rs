@@ -173,6 +173,11 @@ impl Sqids {
 			if !chunks.is_empty() {
 				let alphabet_without_separator: Vec<char> =
 					alphabet.iter().copied().take(alphabet.len() - 1).collect();
+				for c in chunks[0].chars() {
+					if !alphabet_without_separator.contains(&c) {
+						return vec![];
+					}
+				}
 				let num = self.to_number(chunks[0], &alphabet_without_separator);
 				ret.push(num);
 

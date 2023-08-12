@@ -12,5 +12,5 @@ keywords = ["ids", "encode", "sqids", "hashids"]
 
 [dependencies]
 derive_more = "0.99.17"
-serde = "1.0.173"
-serde_json = "1.0.103"
+serde = "1.0.183"
+serde_json = "1.0.104"

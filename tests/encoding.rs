@@ -118,3 +118,10 @@ fn decoding_invalid_character() {
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode("*"), numbers);
 }
+
+#[test]
+fn decoding_invalid_id_with_repeating_reserved_character() {
+	let sqids = Sqids::default();
+	let numbers: Vec<u64> = vec![];
+	assert_eq!(sqids.decode("fff"), numbers);
+}
