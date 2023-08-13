@@ -21,14 +21,14 @@ Features:
 
 Good for:
 
-- ✅ Generating IDs for public URLs (eg: link shortening)
-- ✅ Generating IDs for internal systems (eg: event tracking)
-- ✅ Decoding for quicker database lookups (eg: by primary keys)
+- ☑ Generating IDs for public URLs (eg: link shortening)
+- ☑ Generating IDs for internal systems (eg: event tracking)
+- ☑ Decoding for quicker database lookups (eg: by primary keys)
 
 Not good for:
 
-- ❌ Sensitive data (this is not an encryption library)
-- ❌ User IDs (can be decoded revealing user count)
+- ☒ Sensitive data (this is not an encryption library)
+- ☒ User IDs (can be decoded revealing user count)
 
 ## 🚀 Getting started
 
