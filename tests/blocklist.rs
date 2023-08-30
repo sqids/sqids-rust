@@ -81,3 +81,19 @@ fn match_against_short_blocklist_word() {
 
 	assert_eq!(sqids.decode(&sqids.encode(&[1000]).unwrap()), vec![1000]);
 }
+
+#[test]
+fn blocklist_filtering_in_constructor() {
+	let sqids = Sqids::new(Some(Options::new(
+		Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ".to_string()),
+		None,
+		Some(HashSet::from(["sqnmpn".to_owned()])), // lowercase blocklist in only-uppercase alphabet
+	)))
+	.unwrap();
+
+	let id = sqids.encode(&[1, 2, 3]).unwrap();
+	let numbers = sqids.decode(&id);
+
+	assert_eq!(id, "ULPBZGBM".to_string()); // without blocklist, would've been "SQNMPN"
+	assert_eq!(numbers, vec![1, 2, 3]);
+}

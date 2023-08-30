@@ -87,8 +87,8 @@ impl Sqids {
 			return Err(Error::AlphabetUniqueCharacters);
 		}
 
-		if options.min_length < Self::min_value() as usize ||
-			options.min_length > options.alphabet.len()
+		if options.min_length < Self::min_value() as usize
+			|| options.min_length > options.alphabet.len()
 		{
 			return Err(Error::MinLength {
 				min: Self::min_value() as usize,
@@ -96,12 +96,14 @@ impl Sqids {
 			});
 		}
 
+		let lowercase_alphabet: Vec<char> =
+			alphabet.iter().map(|c| c.to_ascii_lowercase()).collect();
 		let filtered_blocklist: HashSet<String> = options
 			.blocklist
 			.iter()
 			.filter_map(|word| {
 				let word = word.to_lowercase();
-				if word.len() >= 3 && word.chars().all(|c| alphabet.contains(&c)) {
+				if word.len() >= 3 && word.chars().all(|c| lowercase_alphabet.contains(&c)) {
 					Some(word)
 				} else {
 					None
@@ -244,9 +246,9 @@ impl Sqids {
 			}
 
 			if self.min_length > id.len() {
-				id = id[..1].to_string() +
-					&alphabet[..(self.min_length - id.len())].iter().collect::<String>() +
-					&id[1..]
+				id = id[..1].to_string()
+					+ &alphabet[..(self.min_length - id.len())].iter().collect::<String>()
+					+ &id[1..]
 			}
 		}
 

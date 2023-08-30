@@ -10,7 +10,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly-2023-06-15
+          toolchain: stable
           override: true
           components: rustfmt, clippy
       - name: Set up cargo cache
@@ -33,12 +33,10 @@ jobs:
         run: |
           cargo install --locked cargo-deny || true
           cargo install --locked cargo-outdated || true
-          cargo install --locked cargo-udeps || true
       - name: Check
         run: |
           cargo deny check
           cargo outdated --exit-code 1
-          cargo udeps
           rm -rf ~/.cargo/advisory-db
       - name: Test
         run: cargo test --all
