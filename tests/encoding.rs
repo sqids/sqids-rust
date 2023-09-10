@@ -5,7 +5,7 @@ fn simple() {
 	let sqids = Sqids::default();
 
 	let numbers = vec![1, 2, 3];
-	let id = "8QRLaD";
+	let id = "86Rf07";
 
 	assert_eq!(sqids.encode(&numbers).unwrap(), id);
 	assert_eq!(sqids.decode(id), numbers);
@@ -15,7 +15,7 @@ fn simple() {
 fn different_inputs() {
 	let sqids = Sqids::default();
 
-	let numbers = vec![0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, Sqids::max_value()];
+	let numbers = vec![0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, u64::MAX];
 
 	assert_eq!(sqids.decode(&sqids.encode(&numbers).unwrap()), numbers);
 }
@@ -25,16 +25,16 @@ fn incremental_numbers() {
 	let sqids = Sqids::default();
 
 	let ids = vec![
-		("bV", vec![0]),
-		("U9", vec![1]),
-		("g8", vec![2]),
-		("Ez", vec![3]),
-		("V8", vec![4]),
-		("ul", vec![5]),
-		("O3", vec![6]),
-		("AF", vec![7]),
-		("ph", vec![8]),
-		("n8", vec![9]),
+		("bM", vec![0]),
+		("Uk", vec![1]),
+		("gb", vec![2]),
+		("Ef", vec![3]),
+		("Vq", vec![4]),
+		("uw", vec![5]),
+		("OI", vec![6]),
+		("AX", vec![7]),
+		("p6", vec![8]),
+		("nJ", vec![9]),
 	];
 
 	for (id, numbers) in ids {
@@ -48,16 +48,16 @@ fn incremental_numbers_same_index_0() {
 	let sqids = Sqids::default();
 
 	let ids = vec![
-		("SrIu", vec![0, 0]),
-		("nZqE", vec![0, 1]),
-		("tJyf", vec![0, 2]),
-		("e86S", vec![0, 3]),
-		("rtC7", vec![0, 4]),
-		("sQ8R", vec![0, 5]),
-		("uz2n", vec![0, 6]),
-		("7Td9", vec![0, 7]),
-		("3nWE", vec![0, 8]),
-		("mIxM", vec![0, 9]),
+		("SvIz", vec![0, 0]),
+		("n3qa", vec![0, 1]),
+		("tryF", vec![0, 2]),
+		("eg6q", vec![0, 3]),
+		("rSCF", vec![0, 4]),
+		("sR8x", vec![0, 5]),
+		("uY2M", vec![0, 6]),
+		("74dI", vec![0, 7]),
+		("30WX", vec![0, 8]),
+		("moxr", vec![0, 9]),
 	];
 
 	for (id, numbers) in ids {
@@ -71,16 +71,16 @@ fn incremental_numbers_same_index_1() {
 	let sqids = Sqids::default();
 
 	let ids = vec![
-		("SrIu", vec![0, 0]),
-		("nbqh", vec![1, 0]),
-		("t4yj", vec![2, 0]),
-		("eQ6L", vec![3, 0]),
-		("r4Cc", vec![4, 0]),
-		("sL82", vec![5, 0]),
-		("uo2f", vec![6, 0]),
-		("7Zdq", vec![7, 0]),
-		("36Wf", vec![8, 0]),
-		("m4xT", vec![9, 0]),
+		("SvIz", vec![0, 0]),
+		("nWqP", vec![1, 0]),
+		("tSyw", vec![2, 0]),
+		("eX68", vec![3, 0]),
+		("rxCY", vec![4, 0]),
+		("sV8a", vec![5, 0]),
+		("uf2K", vec![6, 0]),
+		("7Cdk", vec![7, 0]),
+		("3aWP", vec![8, 0]),
+		("m2xn", vec![9, 0]),
 	];
 
 	for (id, numbers) in ids {
@@ -117,11 +117,4 @@ fn decoding_invalid_character() {
 	let sqids = Sqids::default();
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode("*"), numbers);
-}
-
-#[test]
-fn decoding_invalid_id_with_repeating_reserved_character() {
-	let sqids = Sqids::default();
-	let numbers: Vec<u64> = vec![];
-	assert_eq!(sqids.decode("fff"), numbers);
 }

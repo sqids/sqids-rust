@@ -4,13 +4,13 @@ description = "Generate YouTube-like ids from numbers."
 repository = "https://github.com/sqids/sqids-rust"
 documentation = "https://docs.rs/sqids"
 homepage = "https://sqids.org/rust"
-version = "0.2.1"
+version = "0.3.0"
 license = "MIT"
 edition = "2021"
 readme = "README.md"
-keywords = ["ids", "encode", "sqids", "hashids"]
+keywords = ["ids", "encode", "short", "sqids", "hashids"]
 
 [dependencies]
 derive_more = "0.99.17"
 serde = "1.0.188"
-serde_json = "1.0.105"
+serde_json = "1.0.106"

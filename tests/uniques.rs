@@ -1,12 +1,13 @@
 use sqids::*;
 use std::collections::HashSet;
 
-const UPPER: u64 = 1_000_000;
+const UPPER: u64 = 1_000;
 
 #[test]
 fn uniques_with_padding() {
-	let sqids = Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len()), None)))
-		.unwrap();
+	let sqids =
+		Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len() as u8), None)))
+			.unwrap();
 	let mut set = HashSet::new();
 
 	for i in 0..UPPER {

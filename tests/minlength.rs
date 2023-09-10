@@ -2,32 +2,75 @@ use sqids::*;
 
 #[test]
 fn simple() {
-	let sqids = Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len()), None)))
-		.unwrap();
+	let sqids =
+		Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len() as u8), None)))
+			.unwrap();
 
 	let numbers = vec![1, 2, 3];
-	let id = "75JILToVsGerOADWmHlY38xvbaNZKQ9wdFS0B6kcMEtnRpgizhjU42qT1cd0dL".to_owned();
+	let id = "86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTM".to_owned();
 
 	assert_eq!(sqids.encode(&numbers).unwrap(), id);
 	assert_eq!(sqids.decode(&id), numbers);
 }
 
 #[test]
+fn incremental() {
+	let numbers = [1, 2, 3];
+	let alphabet_length = Options::default().alphabet.len() as u8;
+
+	let map = vec![
+		(6 as u8, "86Rf07".to_owned()),
+		(7, "86Rf07x".to_owned()),
+		(8, "86Rf07xd".to_owned()),
+		(9, "86Rf07xd4".to_owned()),
+		(10, "86Rf07xd4z".to_owned()),
+		(11, "86Rf07xd4zB".to_owned()),
+		(12, "86Rf07xd4zBm".to_owned()),
+		(13, "86Rf07xd4zBmi".to_owned()),
+		(
+			alphabet_length + 0,
+			"86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTM".to_owned(),
+		),
+		(
+			alphabet_length + 1,
+			"86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTMy".to_owned(),
+		),
+		(
+			alphabet_length + 2,
+			"86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTMyf".to_owned(),
+		),
+		(
+			alphabet_length + 3,
+			"86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTMyf1".to_owned(),
+		),
+	];
+
+	for (min_length, id) in map {
+		let sqids = Sqids::new(Some(Options::new(None, Some(min_length), None))).unwrap();
+
+		assert_eq!(sqids.encode(&numbers).unwrap(), id);
+		assert_eq!(sqids.encode(&numbers).unwrap().len(), min_length as usize);
+		assert_eq!(sqids.decode(&id), numbers);
+	}
+}
+
+#[test]
 fn incremental_numbers() {
-	let sqids = Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len()), None)))
-		.unwrap();
+	let sqids =
+		Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len() as u8), None)))
+			.unwrap();
 
 	let ids = vec![
-		("jf26PLNeO5WbJDUV7FmMtlGXps3CoqkHnZ8cYd19yIiTAQuvKSExzhrRghBlwf".to_owned(), vec![0, 0]),
-		("vQLUq7zWXC6k9cNOtgJ2ZK8rbxuipBFAS10yTdYeRa3ojHwGnmMV4PDhESI2jL".to_owned(), vec![0, 1]),
-		("YhcpVK3COXbifmnZoLuxWgBQwtjsSaDGAdr0ReTHM16yI9vU8JNzlFq5Eu2oPp".to_owned(), vec![0, 2]),
-		("OTkn9daFgDZX6LbmfxI83RSKetJu0APihlsrYoz5pvQw7GyWHEUcN2jBqd4kJ9".to_owned(), vec![0, 3]),
-		("h2cV5eLNYj1x4ToZpfM90UlgHBOKikQFvnW36AC8zrmuJ7XdRytIGPawqYEbBe".to_owned(), vec![0, 4]),
-		("7Mf0HeUNkpsZOTvmcj836P9EWKaACBubInFJtwXR2DSzgYGhQV5i4lLxoT1qdU".to_owned(), vec![0, 5]),
-		("APVSD1ZIY4WGBK75xktMfTev8qsCJw6oyH2j3OnLcXRlhziUmpbuNEar05QCsI".to_owned(), vec![0, 6]),
-		("P0LUhnlT76rsWSofOeyRGQZv1cC5qu3dtaJYNEXwk8Vpx92bKiHIz4MgmiDOF7".to_owned(), vec![0, 7]),
-		("xAhypZMXYIGCL4uW0te6lsFHaPc3SiD1TBgw5O7bvodzjqUn89JQRfk2Nvm4JI".to_owned(), vec![0, 8]),
-		("94dRPIZ6irlXWvTbKywFuAhBoECQOVMjDJp53s2xeqaSzHY8nc17tmkLGwfGNl".to_owned(), vec![0, 9]),
+		("SvIzsqYMyQwI3GWgJAe17URxX8V924Co0DaTZLtFjHriEn5bPhcSkfmvOslpBu".to_owned(), vec![0, 0]),
+		("n3qafPOLKdfHpuNw3M61r95svbeJGk7aAEgYn4WlSjXURmF8IDqZBy0CT2VxQc".to_owned(), vec![0, 1]),
+		("tryFJbWcFMiYPg8sASm51uIV93GXTnvRzyfLleh06CpodJD42B7OraKtkQNxUZ".to_owned(), vec![0, 2]),
+		("eg6ql0A3XmvPoCzMlB6DraNGcWSIy5VR8iYup2Qk4tjZFKe1hbwfgHdUTsnLqE".to_owned(), vec![0, 3]),
+		("rSCFlp0rB2inEljaRdxKt7FkIbODSf8wYgTsZM1HL9JzN35cyoqueUvVWCm4hX".to_owned(), vec![0, 4]),
+		("sR8xjC8WQkOwo74PnglH1YFdTI0eaf56RGVSitzbjuZ3shNUXBrqLxEJyAmKv2".to_owned(), vec![0, 5]),
+		("uY2MYFqCLpgx5XQcjdtZK286AwWV7IBGEfuS9yTmbJvkzoUPeYRHr4iDs3naN0".to_owned(), vec![0, 6]),
+		("74dID7X28VLQhBlnGmjZrec5wTA1fqpWtK4YkaoEIM9SRNiC3gUJH0OFvsPDdy".to_owned(), vec![0, 7]),
+		("30WXpesPhgKiEI5RHTY7xbB1GnytJvXOl2p0AcUjdF6waZDo9Qk8VLzMuWrqCS".to_owned(), vec![0, 8]),
+		("moxr3HqLAK0GsTND6jowfZz3SUx7cQ8aC54Pl1RbIvFXmEJuBMYVeW9yrdOtin".to_owned(), vec![0, 9]),
 	];
 
 	for (id, numbers) in ids {
@@ -38,31 +81,21 @@ fn incremental_numbers() {
 
 #[test]
 fn min_lengths() {
-	for &min_length in &[0, 1, 5, 10, Options::default().alphabet.len()] {
+	for &min_length in &[0, 1, 5, 10, Options::default().alphabet.len() as u8] {
 		for numbers in &[
-			vec![Sqids::min_value()],
+			vec![u64::MIN],
 			vec![0, 0, 0, 0, 0],
 			vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 			vec![100, 200, 300],
 			vec![1_000, 2_000, 3_000],
 			vec![1_000_000],
-			vec![Sqids::max_value()],
+			vec![u64::MAX],
 		] {
 			let sqids = Sqids::new(Some(Options::new(None, Some(min_length), None))).unwrap();
 
 			let id = sqids.encode(&numbers).unwrap();
-			assert!(id.len() >= min_length);
+			assert!(id.len() >= min_length as usize);
 			assert_eq!(sqids.decode(&id), *numbers);
 		}
 	}
-}
-
-#[test]
-fn out_of_range_invalid_min_length() {
-	assert_eq!(
-		Sqids::new(Some(Options::new(None, Some(Options::default().alphabet.len() + 1), None)))
-			.err()
-			.unwrap(),
-		Error::MinLength { min: 0, max: Options::default().alphabet.len() }
-	);
 }

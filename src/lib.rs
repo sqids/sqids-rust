@@ -1,18 +1,16 @@
 use derive_more::Display;
-use std::{collections::HashSet, result};
+use std::{cmp::min, collections::HashSet, result};
 
 #[derive(Display, Debug, Eq, PartialEq)]
 pub enum Error {
-	#[display(fmt = "Alphabet length must be at least 5")]
+	#[display(fmt = "Alphabet cannot contain multibyte characters")]
+	AlphabetMultibyteCharacters,
+	#[display(fmt = "Alphabet length must be at least 3")]
 	AlphabetLength,
 	#[display(fmt = "Alphabet must contain unique characters")]
 	AlphabetUniqueCharacters,
-	#[display(fmt = "Minimum length has to be between {min} and {max}")]
-	MinLength { min: usize, max: usize },
-	#[display(fmt = "Encoding supports numbers between {min} and {max}")]
-	EncodingRange { min: u64, max: u64 },
-	#[display(fmt = "Ran out of range checking against the blocklist")]
-	BlocklistOutOfRange,
+	#[display(fmt = "Reached max attempts to re-generate the ID")]
+	BlocklistMaxAttempts,
 }
 
 pub type Result<T> = result::Result<T, Error>;
@@ -24,14 +22,14 @@ pub fn default_blocklist() -> HashSet<String> {
 #[derive(Debug)]
 pub struct Options {
 	pub alphabet: String,
-	pub min_length: usize,
+	pub min_length: u8,
 	pub blocklist: HashSet<String>,
 }
 
 impl Options {
 	pub fn new(
 		alphabet: Option<String>,
-		min_length: Option<usize>,
+		min_length: Option<u8>,
 		blocklist: Option<HashSet<String>>,
 	) -> Self {
 		let mut options = Options::default();
@@ -63,7 +61,7 @@ impl Default for Options {
 #[derive(Debug)]
 pub struct Sqids {
 	alphabet: Vec<char>,
-	min_length: usize,
+	min_length: u8,
 	blocklist: HashSet<String>,
 }
 
@@ -78,22 +76,19 @@ impl Sqids {
 		let options = options.unwrap_or_default();
 		let alphabet: Vec<char> = options.alphabet.chars().collect();
 
-		if alphabet.len() < 5 {
+		for c in alphabet.iter() {
+			if c.len_utf8() > 1 {
+				return Err(Error::AlphabetMultibyteCharacters);
+			}
+		}
+
+		if alphabet.len() < 3 {
 			return Err(Error::AlphabetLength);
 		}
 
 		let unique_chars: HashSet<char> = alphabet.iter().cloned().collect();
 		if unique_chars.len() != alphabet.len() {
 			return Err(Error::AlphabetUniqueCharacters);
-		}
-
-		if options.min_length < Self::min_value() as usize
-			|| options.min_length > options.alphabet.len()
-		{
-			return Err(Error::MinLength {
-				min: Self::min_value() as usize,
-				max: options.alphabet.len(),
-			});
 		}
 
 		let lowercase_alphabet: Vec<char> =
@@ -111,11 +106,11 @@ impl Sqids {
 			})
 			.collect();
 
-		let mut sqids =
-			Sqids { alphabet, min_length: options.min_length, blocklist: filtered_blocklist };
-
-		sqids.alphabet = sqids.shuffle(&sqids.alphabet);
-		Ok(sqids)
+		Ok(Sqids {
+			alphabet: Self::shuffle(&alphabet),
+			min_length: options.min_length,
+			blocklist: filtered_blocklist,
+		})
 	}
 
 	pub fn encode(&self, numbers: &[u64]) -> Result<String> {
@@ -123,17 +118,7 @@ impl Sqids {
 			return Ok(String::new());
 		}
 
-		let in_range_numbers: Vec<u64> = numbers
-			.iter()
-			.copied()
-			.filter(|&n| n >= Self::min_value() && n <= Self::max_value())
-			.collect();
-
-		if in_range_numbers.len() != numbers.len() {
-			return Err(Error::EncodingRange { min: Self::min_value(), max: Self::max_value() });
-		}
-
-		self.encode_numbers(&in_range_numbers, false)
+		self.encode_numbers(numbers, 0)
 	}
 
 	pub fn decode(&self, id: &str) -> Vec<u64> {
@@ -153,38 +138,25 @@ impl Sqids {
 		let mut alphabet: Vec<char> =
 			self.alphabet.iter().cycle().skip(offset).take(self.alphabet.len()).copied().collect();
 
-		let partition = alphabet[1];
-
-		alphabet.remove(1);
-		alphabet.remove(0);
+		alphabet = alphabet.into_iter().rev().collect();
 
 		let mut id = id[1..].to_string();
 
-		let partition_index = id.find(partition);
-		if let Some(idx) = partition_index {
-			if idx > 0 && idx < id.len() - 1 {
-				id = id.split_off(idx + 1);
-				alphabet = self.shuffle(&alphabet);
-			}
-		}
-
 		while !id.is_empty() {
-			let separator = alphabet[alphabet.len() - 1];
-			let chunks: Vec<&str> = id.split(separator).collect();
+			let separator = alphabet[0];
 
+			let chunks: Vec<&str> = id.split(separator).collect();
 			if !chunks.is_empty() {
-				let alphabet_without_separator: Vec<char> =
-					alphabet.iter().copied().take(alphabet.len() - 1).collect();
-				for c in chunks[0].chars() {
-					if !alphabet_without_separator.contains(&c) {
-						return vec![];
-					}
+				if chunks[0].is_empty() {
+					return ret;
 				}
-				let num = self.to_number(chunks[0], &alphabet_without_separator);
-				ret.push(num);
+
+				let alphabet_without_separator: Vec<char> =
+					alphabet.iter().copied().skip(1).collect();
+				ret.push(self.to_number(chunks[0], &alphabet_without_separator));
 
 				if chunks.len() > 1 {
-					alphabet = self.shuffle(&alphabet);
+					alphabet = Self::shuffle(&alphabet);
 				}
 			}
 
@@ -194,80 +166,52 @@ impl Sqids {
 		ret
 	}
 
-	pub fn min_value() -> u64 {
-		0
-	}
+	fn encode_numbers(&self, numbers: &[u64], increment: usize) -> Result<String> {
+		if increment > self.alphabet.len() {
+			return Err(Error::BlocklistMaxAttempts);
+		}
 
-	pub fn max_value() -> u64 {
-		u64::MAX
-	}
-
-	fn encode_numbers(&self, numbers: &[u64], partitioned: bool) -> Result<String> {
-		let offset = numbers.iter().enumerate().fold(numbers.len(), |a, (i, &v)| {
+		let mut offset = numbers.iter().enumerate().fold(numbers.len(), |a, (i, &v)| {
 			self.alphabet[v as usize % self.alphabet.len()] as usize + i + a
 		}) % self.alphabet.len();
+
+		offset = (offset + increment) % self.alphabet.len();
 
 		let mut alphabet: Vec<char> =
 			self.alphabet.iter().cycle().skip(offset).take(self.alphabet.len()).copied().collect();
 
 		let prefix = alphabet[0];
-		let partition = alphabet[1];
 
-		alphabet.remove(1);
-		alphabet.remove(0);
+		alphabet = alphabet.into_iter().rev().collect();
 
 		let mut ret: Vec<String> = vec![prefix.to_string()];
 
 		for (i, &num) in numbers.iter().enumerate() {
-			let alphabet_without_separator: Vec<char> =
-				alphabet.iter().copied().take(alphabet.len() - 1).collect();
-			ret.push(self.to_id(num, &alphabet_without_separator));
+			ret.push(self.to_id(num, &alphabet[1..]));
 
 			if i < numbers.len() - 1 {
-				let separator = alphabet[alphabet.len() - 1];
-
-				if partitioned && i == 0 {
-					ret.push(partition.to_string());
-				} else {
-					ret.push(separator.to_string());
-				}
-
-				alphabet = self.shuffle(&alphabet);
+				ret.push(alphabet[0].to_string());
+				alphabet = Self::shuffle(&alphabet);
 			}
 		}
 
 		let mut id = ret.join("");
 
-		if self.min_length > id.len() {
-			if !partitioned {
-				let mut new_numbers = vec![0];
-				new_numbers.extend_from_slice(numbers);
-				id = self.encode_numbers(&new_numbers, true)?;
-			}
+		if self.min_length as usize > id.len() {
+			id += &alphabet[0].to_string();
 
-			if self.min_length > id.len() {
-				id = id[..1].to_string()
-					+ &alphabet[..(self.min_length - id.len())].iter().collect::<String>()
-					+ &id[1..]
+			while self.min_length as usize - id.len() > 0 {
+				alphabet = Self::shuffle(&alphabet);
+
+				let slice_len = min(self.min_length as usize - id.len(), alphabet.len());
+				let slice: Vec<char> = alphabet.iter().take(slice_len).cloned().collect();
+
+				id += &slice.iter().collect::<String>();
 			}
 		}
 
 		if self.is_blocked_id(&id) {
-			let mut new_numbers;
-
-			if partitioned {
-				if numbers[0] + 1 > Self::max_value() {
-					return Err(Error::BlocklistOutOfRange);
-				} else {
-					new_numbers = numbers.to_vec();
-					new_numbers[0] += 1;
-				}
-			} else {
-				new_numbers = vec![0];
-				new_numbers.extend_from_slice(numbers);
-			}
-
-			id = self.encode_numbers(&new_numbers, true)?;
+			id = self.encode_numbers(numbers, increment + 1)?;
 		}
 
 		Ok(id)
@@ -301,7 +245,7 @@ impl Sqids {
 		result
 	}
 
-	fn shuffle(&self, alphabet: &[char]) -> Vec<char> {
+	fn shuffle(alphabet: &[char]) -> Vec<char> {
 		let mut chars: Vec<char> = alphabet.to_vec();
 
 		for i in 0..(chars.len() - 1) {

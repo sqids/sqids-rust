@@ -44,24 +44,12 @@ Simple encode & decode:
 
 ```rust
 let sqids = Sqids::default();
-let id = sqids.encode(&[1, 2, 3])?; // "8QRLaD"
+let id = sqids.encode(&[1, 2, 3])?; // "86Rf07"
 let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
 > **Note**
 > 🚧 Because of the algorithm's design, **multiple IDs can decode back into the same sequence of numbers**. If it's important to your design that IDs are canonical, you have to manually re-encode decoded numbers and check that the generated ID matches.
-
-Randomize IDs by providing a custom alphabet:
-
-```rust
-let sqids = Sqids::new(Some(Options::new(
-  Some("FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE".to_string()),
-  None,
-  None,
-)))?;
-let id = sqids.encode(&[1, 2, 3])?; // "B5aMa3"
-let numbers = sqids.decode(&id); // [1, 2, 3]
-```
 
 Enforce a *minimum* length for IDs:
 
@@ -71,7 +59,19 @@ let sqids = Sqids::new(Some(Options::new(
   Some(10),
   None,
 )))?;
-let id = sqids.encode(&[1, 2, 3])?; // "75JT1cd0dL"
+let id = sqids.encode(&[1, 2, 3])?; // "86Rf07xd4z"
+let numbers = sqids.decode(&id); // [1, 2, 3]
+```
+
+Randomize IDs by providing a custom alphabet:
+
+```rust
+let sqids = Sqids::new(Some(Options::new(
+  Some("FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE".to_string()),
+  None,
+  None,
+)))?;
+let id = sqids.encode(&[1, 2, 3])?; // "B4aajs"
 let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 
@@ -81,9 +81,9 @@ Prevent specific words from appearing anywhere in the auto-generated IDs:
 let sqids = Sqids::new(Some(Options::new(
   None,
   None,
-  Some(HashSet::from(["word1".to_string(), "word2".to_string()])),
+  Some(HashSet::from(["86Rf07".to_string()])),
 )))?;
-let id = sqids.encode(&[1, 2, 3])?; // "8QRLaD"
+let id = sqids.encode(&[1, 2, 3])?; // "se8ojk"
 let numbers = sqids.decode(&id); // [1, 2, 3]
 ```
 

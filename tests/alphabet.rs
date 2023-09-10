@@ -6,7 +6,7 @@ fn simple() {
 		Sqids::new(Some(Options::new(Some("0123456789abcdef".to_string()), None, None))).unwrap();
 
 	let numbers = vec![1, 2, 3];
-	let id = "4d9fd2";
+	let id = "489158";
 
 	assert_eq!(sqids.encode(&numbers).unwrap(), id);
 	assert_eq!(sqids.decode(id), numbers);
@@ -14,7 +14,7 @@ fn simple() {
 
 #[test]
 fn short_alphabet() {
-	let sqids = Sqids::new(Some(Options::new(Some("abcde".to_string()), None, None))).unwrap();
+	let sqids = Sqids::new(Some(Options::new(Some("abc".to_string()), None, None))).unwrap();
 
 	let numbers = vec![1, 2, 3];
 	assert_eq!(sqids.decode(&sqids.encode(&numbers).unwrap()), numbers);
@@ -33,6 +33,14 @@ fn long_alphabet() {
 }
 
 #[test]
+fn multibyte_characters() {
+	assert_eq!(
+		Sqids::new(Some(Options::new(Some("ë1092".to_string()), None, None,))).err().unwrap(),
+		Error::AlphabetMultibyteCharacters
+	)
+}
+
+#[test]
 fn repeating_alphabet_characters() {
 	assert_eq!(
 		Sqids::new(Some(Options::new(Some("aabcdefg".to_string()), None, None,))).err().unwrap(),
@@ -43,7 +51,7 @@ fn repeating_alphabet_characters() {
 #[test]
 fn too_short_alphabet() {
 	assert_eq!(
-		Sqids::new(Some(Options::new(Some("abcd".to_string()), None, None,))).err().unwrap(),
+		Sqids::new(Some(Options::new(Some("ab".to_string()), None, None,))).err().unwrap(),
 		Error::AlphabetLength
 	)
 }
