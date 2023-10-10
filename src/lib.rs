@@ -1,15 +1,16 @@
-use derive_more::Display;
 use std::{cmp::min, collections::HashSet, result};
 
-#[derive(Display, Debug, Eq, PartialEq)]
+use thiserror::Error;
+
+#[derive(Error, Debug, Eq, PartialEq)]
 pub enum Error {
-	#[display(fmt = "Alphabet cannot contain multibyte characters")]
+	#[error("Alphabet cannot contain multibyte characters")]
 	AlphabetMultibyteCharacters,
-	#[display(fmt = "Alphabet length must be at least 3")]
+	#[error("Alphabet length must be at least 3")]
 	AlphabetLength,
-	#[display(fmt = "Alphabet must contain unique characters")]
+	#[error("Alphabet must contain unique characters")]
 	AlphabetUniqueCharacters,
-	#[display(fmt = "Reached max attempts to re-generate the ID")]
+	#[error("Reached max attempts to re-generate the ID")]
 	BlocklistMaxAttempts,
 }
 
