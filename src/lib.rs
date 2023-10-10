@@ -13,6 +13,8 @@ pub enum Error {
 	BlocklistMaxAttempts,
 }
 
+impl std::error::Error for Error {}
+
 pub type Result<T> = result::Result<T, Error>;
 
 pub fn default_blocklist() -> HashSet<String> {
