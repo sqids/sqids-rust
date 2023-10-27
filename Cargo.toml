@@ -11,6 +11,6 @@ readme = "README.md"
 keywords = ["ids", "encode", "short", "sqids", "hashids"]
 
 [dependencies]
-serde = "1.0.189"
+serde = "1.0.190"
 serde_json = "1.0.107"
 thiserror = "1.0.50"
