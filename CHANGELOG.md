@@ -1,5 +1,10 @@
 # CHANGELOG
 
+**v0.3.1:**
+- Improvement: impl error for Error [[PR #3](https://github.com/sqids/sqids-rust/pull/3)]
+- Using `thiserror`
+- Cargo update
+
 **v0.3.0:** **⚠️ BREAKING CHANGE**
 - **Breaking change**: IDs change. Algorithm has been fine-tuned for better performance [[Issue #11](https://github.com/sqids/sqids-spec/issues/11)]
 - `alphabet` cannot contain multibyte characters
