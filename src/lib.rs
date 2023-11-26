@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+#![allow(clippy::tabs_in_doc_comments)]
+
 #![doc = include_str!("../README.md")]
 
 // Make the link to the LICENSE in README.md work.
@@ -13,34 +16,78 @@ use std::{cmp::min, collections::HashSet, result};
 use derive_builder::Builder;
 use thiserror::Error;
 
+/// sqids Error type.
 #[derive(Error, Debug, Eq, PartialEq)]
 pub enum Error {
+	/// Alphabet cannot contain multibyte characters
+	///
+	/// ```
+	/// # use sqids::{Sqids, Error};
+	/// let error = Sqids::builder().alphabet("☃️🦀🔥".chars().collect()).build().unwrap_err();
+	/// assert_eq!(error, Error::AlphabetMultibyteCharacters);
+	/// ```
 	#[error("Alphabet cannot contain multibyte characters")]
 	AlphabetMultibyteCharacters,
+	/// Alphabet length must be at least 3
+	///
+	/// ```
+	/// # use sqids::{Sqids, Error};
+	/// let error = Sqids::builder().alphabet("ab".chars().collect()).build().unwrap_err();
+	/// assert_eq!(error, Error::AlphabetLength);
+	/// ```
 	#[error("Alphabet length must be at least 3")]
 	AlphabetLength,
+	/// Alphabet must contain unique characters
+	///
+	/// ```
+	/// # use sqids::{Sqids, Error};
+	/// let error = Sqids::builder().alphabet("aba".chars().collect()).build().unwrap_err();
+	/// assert_eq!(error, Error::AlphabetUniqueCharacters);
+	/// ```
 	#[error("Alphabet must contain unique characters")]
 	AlphabetUniqueCharacters,
+	/// Reached max attempts to re-generate the ID
+	///
+	/// ```
+	/// # use sqids::{Sqids, Error};
+	/// let sqids = Sqids::builder()
+	/// 	.alphabet("abc".chars().collect())
+	/// 	.min_length(3)
+	/// 	.blocklist(["aac".to_string(), "bba".to_string(), "ccb".to_string()].into())
+	/// 	.build()
+	/// 	.unwrap();
+	/// let error = sqids.encode(&[1]).unwrap_err();
+	/// assert_eq!(error, Error::BlocklistMaxAttempts);
+	/// ```
 	#[error("Reached max attempts to re-generate the ID")]
 	BlocklistMaxAttempts,
 }
 
+/// type alias for Result<T, Error>
 pub type Result<T> = result::Result<T, Error>;
 
+/// The default alphabet used when none is given when creating a [Sqids].
 pub const DEFAULT_ALPHABET: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+/// Returns the default blocklist when none is given when creating a [Sqids].
 pub fn default_blocklist() -> HashSet<String> {
 	serde_json::from_str(include_str!("blocklist.json")).unwrap()
 }
 
+/// Options for creating a [Sqids].
 #[derive(Debug)]
 pub struct Options {
+	/// The [Sqids] alphabet.
 	pub alphabet: String,
+	/// The minimum length of a sqid.
 	pub min_length: u8,
+	/// Blocklist. When creating a sqid [Sqids] will try to avoid generating a string that begins
+	/// with one of these.
 	pub blocklist: HashSet<String>,
 }
 
 impl Options {
+	/// Create an [Options] object.
 	pub fn new(
 		alphabet: Option<String>,
 		min_length: Option<u8>,
@@ -72,11 +119,16 @@ impl Default for Options {
 	}
 }
 
+/// A generator for sqids.
 #[derive(Debug, Builder)]
 #[builder(build_fn(skip, error = "Error"), pattern = "owned")]
 pub struct Sqids {
+	/// The alphabet that is being used when generating sqids.
 	alphabet: Vec<char>,
+	/// The minimum length of a sqid.
 	min_length: u8,
+	/// Blocklist. When creating a sqid strings that begins
+	/// with one of these will be avoided.
 	blocklist: HashSet<String>,
 }
 
@@ -87,10 +139,12 @@ impl Default for Sqids {
 }
 
 impl SqidsBuilder {
+	/// Create a [SqidsBuilder].
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Build a [Sqids] object.
 	pub fn build(self) -> Result<Sqids> {
 		let alphabet: Vec<char> =
 			self.alphabet.unwrap_or_else(|| DEFAULT_ALPHABET.chars().collect());
@@ -135,6 +189,7 @@ impl SqidsBuilder {
 }
 
 impl Sqids {
+	/// Create a [Sqids] from [Options].
 	pub fn new(options: Option<Options>) -> Result<Self> {
 		let options = options.unwrap_or_default();
 		Self::builder()
@@ -144,10 +199,17 @@ impl Sqids {
 			.build()
 	}
 
+	/// Create a [SqidsBuilder].
 	pub fn builder() -> SqidsBuilder {
 		SqidsBuilder::default()
 	}
 
+	/// Generate a sqid from a slice of numbers.
+	///
+	/// When an sqid is generated it is checked against the [SqidsBuilder::blocklist]. When a
+	/// blocked word is encountered another attempt is made by shifting the alphabet.
+	/// When the alphabet is exhausted and all possible sqids for this input are blocked
+	/// [Error::BlocklistMaxAttempts] is returned.
 	pub fn encode(&self, numbers: &[u64]) -> Result<String> {
 		if numbers.is_empty() {
 			return Ok(String::new());
@@ -156,6 +218,8 @@ impl Sqids {
 		self.encode_numbers(numbers, 0)
 	}
 
+	/// Decode a sqid into a vector of numbers. When an invalid sqid is encountered an empty vector
+	/// is returned.
 	pub fn decode(&self, id: &str) -> Vec<u64> {
 		let mut ret = Vec::new();
 
