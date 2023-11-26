@@ -1,6 +1,5 @@
 #![warn(missing_docs)]
 #![allow(clippy::tabs_in_doc_comments)]
-
 #![doc = include_str!("../README.md")]
 
 // Make the link to the LICENSE in README.md work.
