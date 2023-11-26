@@ -1,3 +1,13 @@
+#![doc = include_str!("../README.md")]
+
+// Make the link to the LICENSE in README.md work.
+#[cfg(doc)]
+#[doc = include_str!("../LICENSE")]
+///
+/// ---
+/// **Note**: This is the crate's license and not an actual item.
+pub const LICENSE: () = ();
+
 use std::{cmp::min, collections::HashSet, result};
 
 use derive_builder::Builder;
