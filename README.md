@@ -43,9 +43,11 @@ cargo add sqids
 Simple encode & decode:
 
 ```rust
+# use sqids::Sqids;
 let sqids = Sqids::default();
 let id = sqids.encode(&[1, 2, 3])?; // "86Rf07"
 let numbers = sqids.decode(&id); // [1, 2, 3]
+# Ok::<(), sqids::Error>(())
 ```
 
 > **Note**
@@ -54,37 +56,37 @@ let numbers = sqids.decode(&id); // [1, 2, 3]
 Enforce a *minimum* length for IDs:
 
 ```rust
-let sqids = Sqids::new(Some(Options::new(
-  None,
-  Some(10),
-  None,
-)))?;
+# use sqids::Sqids;
+let sqids = Sqids::builder()
+  .min_length(10)
+  .build()?;
 let id = sqids.encode(&[1, 2, 3])?; // "86Rf07xd4z"
 let numbers = sqids.decode(&id); // [1, 2, 3]
+# Ok::<(), sqids::Error>(())
 ```
 
 Randomize IDs by providing a custom alphabet:
 
 ```rust
-let sqids = Sqids::new(Some(Options::new(
-  Some("FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE".to_string()),
-  None,
-  None,
-)))?;
+# use sqids::Sqids;
+let sqids = Sqids::builder()
+  .alphabet("FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE".chars().collect())
+  .build()?;
 let id = sqids.encode(&[1, 2, 3])?; // "B4aajs"
 let numbers = sqids.decode(&id); // [1, 2, 3]
+# Ok::<(), sqids::Error>(())
 ```
 
 Prevent specific words from appearing anywhere in the auto-generated IDs:
 
 ```rust
-let sqids = Sqids::new(Some(Options::new(
-  None,
-  None,
-  Some(HashSet::from(["86Rf07".to_string()])),
-)))?;
+# use sqids::Sqids;
+let sqids = Sqids::builder()
+  .blocklist(["86Rf07".to_string()].into())
+  .build()?;
 let id = sqids.encode(&[1, 2, 3])?; // "se8ojk"
 let numbers = sqids.decode(&id); // [1, 2, 3]
+# Ok::<(), sqids::Error>(())
 ```
 
 ## 📝 License

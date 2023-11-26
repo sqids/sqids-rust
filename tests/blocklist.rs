@@ -39,11 +39,13 @@ fn blocklist() {
 		None,
 		None,
 		Some(HashSet::from([
-			"JSwXFaosAN".to_owned(), // normal result of 1st encoding, let's block that word on purpose
+			"JSwXFaosAN".to_owned(), /* normal result of 1st encoding, let's block that word on
+			                          * purpose */
 			"OCjV9JK64o".to_owned(), // result of 2nd encoding
-			"rBHf".to_owned(),       // result of 3rd encoding is `4rBHfOiqd3`, let's block a substring
-			"79SM".to_owned(),       // result of 4th encoding is `dyhgw479SM`, let's block the postfix
-			"7tE6".to_owned(),       // result of 4th encoding is `7tE6jdAHLe`, let's block the prefix
+			"rBHf".to_owned(),       /* result of 3rd encoding is `4rBHfOiqd3`, let's block a
+			                          * substring */
+			"79SM".to_owned(), // result of 4th encoding is `dyhgw479SM`, let's block the postfix
+			"7tE6".to_owned(), // result of 4th encoding is `7tE6jdAHLe`, let's block the prefix
 		])),
 	)))
 	.unwrap();
@@ -87,7 +89,8 @@ fn blocklist_filtering_in_constructor() {
 	let sqids = Sqids::new(Some(Options::new(
 		Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ".to_string()),
 		None,
-		Some(HashSet::from(["sxnzkl".to_owned()])), // lowercase blocklist in only-uppercase alphabet
+		Some(HashSet::from(["sxnzkl".to_owned()])), /* lowercase blocklist in only-uppercase
+		                                             * alphabet */
 	)))
 	.unwrap();
 
