@@ -1,5 +1,6 @@
 use std::{cmp::min, collections::HashSet, result};
 
+use derive_builder::Builder;
 use thiserror::Error;
 
 #[derive(Error, Debug, Eq, PartialEq)]
@@ -15,6 +16,8 @@ pub enum Error {
 }
 
 pub type Result<T> = result::Result<T, Error>;
+
+pub const DEFAULT_ALPHABET: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 pub fn default_blocklist() -> HashSet<String> {
 	serde_json::from_str(include_str!("blocklist.json")).unwrap()
@@ -52,14 +55,15 @@ impl Options {
 impl Default for Options {
 	fn default() -> Self {
 		Options {
-			alphabet: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".to_string(),
+			alphabet: DEFAULT_ALPHABET.to_string(),
 			min_length: 0,
 			blocklist: default_blocklist(),
 		}
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
+#[builder(build_fn(skip, error = "Error"), pattern = "owned")]
 pub struct Sqids {
 	alphabet: Vec<char>,
 	min_length: u8,
@@ -68,14 +72,18 @@ pub struct Sqids {
 
 impl Default for Sqids {
 	fn default() -> Self {
-		Sqids::new(None).unwrap()
+		Self::builder().build().unwrap()
 	}
 }
 
-impl Sqids {
-	pub fn new(options: Option<Options>) -> Result<Self> {
-		let options = options.unwrap_or_default();
-		let alphabet: Vec<char> = options.alphabet.chars().collect();
+impl SqidsBuilder {
+	pub fn new() -> Self {
+		Self::default()
+	}
+
+	pub fn build(self) -> Result<Sqids> {
+		let alphabet: Vec<char> =
+			self.alphabet.unwrap_or_else(|| DEFAULT_ALPHABET.chars().collect());
 
 		for c in alphabet.iter() {
 			if c.len_utf8() > 1 {
@@ -94,8 +102,9 @@ impl Sqids {
 
 		let lowercase_alphabet: Vec<char> =
 			alphabet.iter().map(|c| c.to_ascii_lowercase()).collect();
-		let filtered_blocklist: HashSet<String> = options
+		let filtered_blocklist: HashSet<String> = self
 			.blocklist
+			.unwrap_or_else(default_blocklist)
 			.iter()
 			.filter_map(|word| {
 				let word = word.to_lowercase();
@@ -108,10 +117,25 @@ impl Sqids {
 			.collect();
 
 		Ok(Sqids {
-			alphabet: Self::shuffle(&alphabet),
-			min_length: options.min_length,
+			alphabet: Sqids::shuffle(&alphabet),
+			min_length: self.min_length.unwrap_or(0),
 			blocklist: filtered_blocklist,
 		})
+	}
+}
+
+impl Sqids {
+	pub fn new(options: Option<Options>) -> Result<Self> {
+		let options = options.unwrap_or_default();
+		Self::builder()
+			.min_length(options.min_length)
+			.alphabet(options.alphabet.chars().collect())
+			.blocklist(options.blocklist)
+			.build()
+	}
+
+	pub fn builder() -> SqidsBuilder {
+		SqidsBuilder::default()
 	}
 
 	pub fn encode(&self, numbers: &[u64]) -> Result<String> {
