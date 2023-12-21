@@ -1,7 +1,7 @@
 # CHANGELOG
 
 **v0.4.0:**
-- Introduced Sqids::builder() [[PR #5](https://github.com/sqids/sqids-rust/pull/5)]
+- Introduced `Sqids::builder()` [[PR #5](https://github.com/sqids/sqids-rust/pull/5)]
 - Cargo update
 - Docs cleanup
 
