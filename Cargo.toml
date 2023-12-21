@@ -1,10 +1,10 @@
 [package]
 name = "sqids"
-description = "Generate YouTube-like ids from numbers."
+description = "Generate short unique ids from numbers."
 repository = "https://github.com/sqids/sqids-rust"
 documentation = "https://docs.rs/sqids"
 homepage = "https://sqids.org/rust"
-version = "0.3.1"
+version = "0.4.0"
 license = "MIT"
 edition = "2021"
 readme = "README.md"

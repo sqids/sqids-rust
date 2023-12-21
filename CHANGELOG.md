@@ -1,5 +1,10 @@
 # CHANGELOG
 
+**v0.4.0:**
+- Introduced Sqids::builder() [[PR #5](https://github.com/sqids/sqids-rust/pull/5)]
+- Cargo update
+- Docs cleanup
+
 **v0.3.1:**
 - Improvement: impl error for Error [[PR #3](https://github.com/sqids/sqids-rust/pull/3)]
 - Using `thiserror`
