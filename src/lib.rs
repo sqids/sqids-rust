@@ -119,7 +119,7 @@ impl Default for Options {
 }
 
 /// A generator for sqids.
-#[derive(Debug, Builder)]
+#[derive(Clone, Debug, Builder)]
 #[builder(build_fn(skip, error = "Error"), pattern = "owned")]
 pub struct Sqids {
 	/// The alphabet that is being used when generating sqids.
