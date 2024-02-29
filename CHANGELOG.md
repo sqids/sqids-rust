@@ -1,5 +1,9 @@
 # CHANGELOG
 
+**v0.4.1:**
+- Derive `Clone` trait [[PR #6](https://github.com/sqids/sqids-rust/pull/6)]
+- Cargo update
+
 **v0.4.0:**
 - Introduced `Sqids::builder()` [[PR #5](https://github.com/sqids/sqids-rust/pull/5)]
 - Cargo update
