@@ -251,9 +251,8 @@ impl Sqids {
 
 				let alphabet_without_separator: Vec<char> =
 					alphabet.iter().copied().skip(1).collect();
-				match self.to_number(chunks[0], &alphabet_without_separator) {
-					Some(value) => ret.push(value),
-					None => (),
+				if let Some(value) = self.to_number(chunks[0], &alphabet_without_separator) {
+					ret.push(value)
 				}
 
 				if chunks.len() > 1 {
