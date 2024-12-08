@@ -251,7 +251,10 @@ impl Sqids {
 
 				let alphabet_without_separator: Vec<char> =
 					alphabet.iter().copied().skip(1).collect();
-				ret.push(self.to_number(chunks[0], &alphabet_without_separator));
+				match self.to_number(chunks[0], &alphabet_without_separator) {
+					Some(value) => ret.push(value),
+					None => (),
+				}
 
 				if chunks.len() > 1 {
 					alphabet = Self::shuffle(&alphabet);
@@ -332,15 +335,19 @@ impl Sqids {
 		id.into_iter().collect()
 	}
 
-	fn to_number(&self, id: &str, alphabet: &[char]) -> u64 {
+	fn to_number(&self, id: &str, alphabet: &[char]) -> Option<u64> {
 		let mut result = 0;
 
 		for c in id.chars() {
 			let idx = alphabet.iter().position(|&x| x == c).unwrap();
-			result = result * alphabet.len() as u64 + idx as u64;
+			result = result * alphabet.len() as u128 + idx as u128;
 		}
 
-		result
+		if result <= u64::MAX.into() {
+			Some(result.try_into().unwrap())
+		} else {
+			None
+		}
 	}
 
 	fn shuffle(alphabet: &[char]) -> Vec<char> {
