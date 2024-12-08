@@ -1,5 +1,8 @@
 # CHANGELOG
 
+**v0.4.2:**
+- Fix u64 overflow
+
 **v0.4.1:**
 - Derive `Clone` trait [[PR #6](https://github.com/sqids/sqids-rust/pull/6)]
 - Cargo update
