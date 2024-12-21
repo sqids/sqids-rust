@@ -1,7 +1,9 @@
 # CHANGELOG
 
 **v0.4.2:**
-- Fix u64 overflow
+- Fix u64 overflow panic [[PR #5](https://github.com/sqids/sqids-rust/pull/7)]
+- Cargo update
+- `cargo deny` update
 
 **v0.4.1:**
 - Derive `Clone` trait [[PR #6](https://github.com/sqids/sqids-rust/pull/6)]

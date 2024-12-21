@@ -335,18 +335,24 @@ impl Sqids {
 	}
 
 	fn to_number(&self, id: &str, alphabet: &[char]) -> Option<u64> {
-		let mut result = 0;
+		let mut result: u64 = 0;
+		let base = alphabet.len() as u64;
 
 		for c in id.chars() {
-			let idx = alphabet.iter().position(|&x| x == c).unwrap();
-			result = result * alphabet.len() as u128 + idx as u128;
+			let idx = alphabet.iter().position(|&x| x == c).unwrap() as u64;
+
+			if let Some(new_result) = result.checked_mul(base) {
+				if let Some(final_result) = new_result.checked_add(idx) {
+					result = final_result;
+				} else {
+					return None;
+				}
+			} else {
+				return None;
+			}
 		}
 
-		if result <= u64::MAX.into() {
-			Some(result.try_into().unwrap())
-		} else {
-			None
-		}
+		Some(result)
 	}
 
 	fn shuffle(alphabet: &[char]) -> Vec<char> {

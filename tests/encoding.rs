@@ -118,3 +118,17 @@ fn decoding_invalid_character() {
 	let numbers: Vec<u64> = vec![];
 	assert_eq!(sqids.decode("*"), numbers);
 }
+
+#[test]
+fn decoding_number_maximum_value() {
+	let sqids = Sqids::default();
+	let numbers = sqids.decode("ABARpJzdz9");
+	assert_eq!(numbers, [9_007_199_254_740_991]); // 2 ^ 53
+}
+
+#[test]
+fn decoding_number_overflows() {
+	let sqids = Sqids::default();
+	let numbers = sqids.decode("0J4AEXRN106Z0"); // `https://github.com/sqids/sqids-rust/pull/7`
+	assert_eq!(numbers, Vec::<u64>::new());
+}
