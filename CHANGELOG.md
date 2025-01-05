@@ -1,5 +1,9 @@
 # CHANGELOG
 
+**v0.4.3:**
+- More tests for `is_blocked_id`
+- Cargo update
+
 **v0.4.2:**
 - Fix u64 overflow panic [[PR #5](https://github.com/sqids/sqids-rust/pull/7)]
 - Cargo update

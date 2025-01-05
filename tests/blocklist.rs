@@ -119,3 +119,33 @@ fn max_encoding_attempts() {
 
 	assert_eq!(sqids.encode(&[0]).err().unwrap(), Error::BlocklistMaxAttempts);
 }
+
+#[test]
+fn specific_is_blocked_id_scenarios() {
+	let sqids = Sqids::builder().blocklist(["hey".to_string()].into()).build().unwrap();
+	assert_eq!(sqids.encode(&[100]).unwrap(), "86u".to_string());
+
+	let sqids = Sqids::builder().blocklist(["86u".to_string()].into()).build().unwrap();
+	assert_eq!(sqids.encode(&[100]).unwrap(), "sec".to_string());
+
+	let sqids = Sqids::builder().blocklist(["vFo".to_string()].into()).build().unwrap();
+	assert_eq!(sqids.encode(&[1_000_000]).unwrap(), "gMvFo".to_string());
+
+	let sqids = Sqids::builder().blocklist(["lP3i".to_string()].into()).build().unwrap();
+	assert_eq!(sqids.encode(&[100, 202, 303, 404]).unwrap(), "oDqljxrokxRt".to_string());
+
+	let sqids = Sqids::builder().blocklist(["1HkYs".to_string()].into()).build().unwrap();
+	assert_eq!(sqids.encode(&[100, 202, 303, 404]).unwrap(), "oDqljxrokxRt".to_string());
+
+	let sqids = Sqids::builder().blocklist(["0hfxX".to_string()].into()).build().unwrap();
+	assert_eq!(
+		sqids.encode(&[101, 202, 303, 404, 505, 606, 707]).unwrap(),
+		"862REt0hfxXVdsLG8vGWD".to_string()
+	);
+
+	let sqids = Sqids::builder().blocklist(["hfxX".to_string()].into()).build().unwrap();
+	assert_eq!(
+		sqids.encode(&[101, 202, 303, 404, 505, 606, 707]).unwrap(),
+		"seu8n1jO9C4KQQDxdOxsK".to_string()
+	);
+}

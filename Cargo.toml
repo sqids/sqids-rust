@@ -4,7 +4,7 @@ description = "Generate short unique ids from numbers."
 repository = "https://github.com/sqids/sqids-rust"
 documentation = "https://docs.rs/sqids"
 homepage = "https://sqids.org/rust"
-version = "0.4.2"
+version = "0.4.3"
 license = "MIT"
 edition = "2021"
 readme = "README.md"
@@ -12,6 +12,6 @@ keywords = ["ids", "encode", "short", "sqids", "hashids"]
 
 [dependencies]
 derive_builder = "0.20.2"
-serde = "1.0.216"
-serde_json = "1.0.133"
-thiserror = "2.0.8"
+serde = "1.0.217"
+serde_json = "1.0.134"
+thiserror = "2.0.9"
